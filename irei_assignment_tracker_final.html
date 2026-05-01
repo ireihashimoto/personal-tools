@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irei — Assignment Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fdf6ec;--bg2:#f7ede0;--bg3:#f0e4d0;--bg4:#e8d8be;
+  --border:#dccaa8;--border2:#c8b490;
+  --text:#1c1510;--text2:#3a2e22;--text3:#6e5e48;--text4:#9e8c74;--text5:#c8b490;
+  --acc:#166534;--neg:#dc2626;--navy:#1e3a5f;
+  --font-serif:'DM Serif Display',serif;--font-mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-mono);min-height:100vh;padding:2rem 1.5rem 4rem}
+.header{border-bottom:1px solid var(--border2);padding-bottom:1.5rem;margin-bottom:2rem;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem}
+.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text4);margin-bottom:6px}
+h1{font-family:var(--font-serif);font-style:italic;font-size:30px;color:var(--text)}
+.badge{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);background:var(--bg3);border:1px solid var(--border2);padding:6px 14px;border-radius:2px;white-space:nowrap}
+.lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text4);margin-bottom:.9rem;padding-bottom:7px;border-bottom:1px solid var(--border);margin-top:2rem}
+.lbl:first-of-type{margin-top:0}
+
+/* STATS */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1px;background:var(--border);border:1px solid var(--border2);border-radius:2px;margin-bottom:2rem;overflow:hidden}
+.stat{background:var(--bg2);padding:1rem}
+.sl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text4);margin-bottom:5px}
+.sv{font-family:var(--font-serif);font-size:26px;line-height:1;color:var(--text)}
+.ss{font-size:11px;color:var(--text3);margin-top:3px}
+.pos{color:var(--acc)!important}.neg{color:var(--neg)!important}.navy{color:var(--navy)!important}
+
+/* COURSES */
+.course-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:2rem;padding:1rem;background:var(--bg2);border:1px solid var(--border2);border-radius:2px;align-items:center}
+.course-chip{display:flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:2px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2)}
+.course-chip-del{background:transparent;border:none;color:var(--text4);cursor:pointer;font-size:13px;padding:0 2px;line-height:1;transition:color .15s}
+.course-chip-del:hover{color:var(--neg)}
+.course-add{display:flex;gap:6px;flex:1;min-width:180px}
+.course-input{flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:5px 10px;border-radius:2px;outline:none;min-width:0}
+.course-input::placeholder{color:var(--text4)}.course-input:focus{border-color:var(--text3)}
+.course-hint{font-size:11px;color:var(--text4);width:100%}
+
+/* ADD FORM */
+.add-form{background:var(--bg2);border:1px solid var(--border2);border-radius:2px;padding:1.2rem;margin-bottom:2rem}
+.frow{display:flex;gap:8px;flex-wrap:wrap}
+.fi{background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:8px 12px;border-radius:2px;outline:none}
+.fi::placeholder{color:var(--text4)}.fi:focus{border-color:var(--text3)}
+.fi.grow{flex:2;min-width:140px}
+.fsel{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);font-family:var(--font-mono);font-size:12px;padding:8px 12px;border-radius:2px;outline:none;flex:1;min-width:110px}
+.fdate{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);font-family:var(--font-mono);font-size:12px;padding:8px 12px;border-radius:2px;outline:none;flex:1;min-width:130px}
+.fbtn{background:var(--acc);color:#fff;border:none;font-family:var(--font-mono);font-size:12px;font-weight:500;padding:8px 18px;border-radius:2px;cursor:pointer;white-space:nowrap}
+.fbtn:hover{opacity:.85}
+
+/* ITEMS */
+.cat-section{margin-bottom:1.5rem}
+.cat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem;padding-bottom:7px;border-bottom:1px solid var(--border);margin-top:2rem}
+.cat-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text4);display:flex;align-items:center;gap:8px}
+.cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cat-count{font-size:10px;color:var(--text4);background:var(--bg3);padding:2px 8px;border-radius:10px;border:1px solid var(--border)}
+.item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:2px;margin-bottom:6px;transition:background .15s}
+.item:hover{background:var(--bg3)}
+.item.overdue{border-left:3px solid var(--neg)}
+.item.due-today{border-left:3px solid var(--navy)}
+.item.due-soon{border-left:3px solid var(--acc)}
+.item.upcoming{border-left:3px solid var(--border2)}
+.item-check{width:18px;height:18px;border-radius:3px;border:1px solid var(--border2);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent;transition:all .15s}
+.item-check:hover{border-color:var(--acc);color:rgba(22,101,52,.4)}
+.item-body{flex:1;min-width:0}
+.item-name{font-size:13px;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.item-course{font-size:11px;color:var(--text3)}
+.item-type{font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:10px;border:1px solid;white-space:nowrap}
+.item-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.item-due{font-size:12px;font-weight:500;white-space:nowrap}
+.item-days{font-size:11px;white-space:nowrap}
+.item-del{background:transparent;border:none;color:var(--text4);cursor:pointer;font-size:16px;padding:0 4px;transition:color .15s}
+.item-del:hover{color:var(--neg)}
+.empty-section{font-size:12px;color:var(--text4);padding:12px 14px;background:var(--bg2);border:1px dashed var(--border);border-radius:2px;text-align:center}
+
+.foot{font-size:10px;color:var(--text5);text-align:center;padding-top:1.5rem;border-top:1px solid var(--border);letter-spacing:.06em;margin-top:1rem}
+@media(max-width:500px){.frow{flex-direction:column}.item-days{display:none}body{padding:1.2rem 1rem 3rem}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="eyebrow">Irei Hashimoto · Rutgers</div>
+    <h1>Assignment Tracker</h1>
+  </div>
+  <div class="badge" id="dateBadge"></div>
+</div>
+
+<div class="lbl" style="margin-top:0">Overview</div>
+<div class="stat-row" id="statRow"></div>
+
+<div class="lbl">Courses</div>
+<div class="course-bar" id="courseBar">
+  <div class="course-add">
+    <input class="course-input" id="courseInput" placeholder="Add a course..." type="text">
+    <button class="fbtn" onclick="addCourse()" style="padding:5px 12px">Add</button>
+  </div>
+  <div class="course-hint">Add your courses here — they appear in the dropdown when logging assignments.</div>
+</div>
+
+<div class="lbl">Log assignment or exam</div>
+<div class="add-form">
+  <div class="frow">
+    <input class="fi grow" id="taskName" placeholder="Assignment or exam name" type="text">
+    <select class="fsel" id="taskCourse"></select>
+    <select class="fsel" id="taskType">
+      <option value="exam">Exam</option>
+      <option value="homework">Homework</option>
+      <option value="quiz">Quiz</option>
+      <option value="lab">Lab</option>
+      <option value="project">Project</option>
+      <option value="other">Other</option>
+    </select>
+    <input class="fdate" id="taskDue" type="date">
+    <button class="fbtn" onclick="addTask()">Add</button>
+  </div>
+</div>
+
+<div id="taskSections"></div>
+
+<div class="foot">rutgers · irei hashimoto</div>
+
+<script>
+const TYPE_COLORS={
+  exam:    {bg:'rgba(220,38,38,.1)', border:'rgba(220,38,38,.35)', text:'#dc2626'},
+  homework:{bg:'rgba(22,101,52,.1)', border:'rgba(22,101,52,.35)', text:'#166534'},
+  quiz:    {bg:'rgba(30,58,95,.1)',  border:'rgba(30,58,95,.35)',  text:'#1e3a5f'},
+  lab:     {bg:'rgba(15,118,110,.1)',border:'rgba(15,118,110,.35)',text:'#0f766e'},
+  project: {bg:'rgba(124,58,237,.1)',border:'rgba(124,58,237,.35)',text:'#7c3aed'},
+  other:   {bg:'rgba(110,94,72,.1)', border:'rgba(110,94,72,.3)', text:'#6e5e48'},
+};
+
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const DEFAULT={courses:[],tasks:[]};
+const SUPA_URL='https://fcgdemqeyuriwqjtvkmr.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjZ2RlbXFleXVyaXdxanR2a21yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDIzODYsImV4cCI6MjA5MzE3ODM4Nn0.CQ5y4oKZliCBGDRe1smBOg0g4llv0OE7nxdY1tLE-CY';
+const SUPA_HEADERS={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'resolution=merge-duplicates'};
+
+async function load(){
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/assignments?id=eq.main&select=data`,{headers:SUPA_HEADERS});
+    const rows=await r.json();
+    if(rows&&rows.length>0&&rows[0].data) return rows[0].data;
+  }catch(e){console.log('Load failed',e);}
+  return JSON.parse(JSON.stringify(DEFAULT));
+}
+
+async function persist(){
+  try{
+    await fetch(`${SUPA_URL}/rest/v1/assignments`,{method:'POST',headers:SUPA_HEADERS,body:JSON.stringify({id:'main',data,updated_at:new Date().toISOString()})});
+  }catch(e){console.log('Save failed',e);}
+}
+let data=load();
+
+function today(){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function parseDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+function daysUntil(s){return Math.round((parseDate(s)-today())/(1000*60*60*24));}
+function fmtDate(s){return parseDate(s).toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+
+// COURSES
+function addCourse(){
+  const name=document.getElementById('courseInput').value.trim();
+  if(!name||data.courses.includes(name))return;
+  data.courses.push(name);
+  persist();
+  document.getElementById('courseInput').value='';
+  renderCourses();
+  renderCourseSelect();
+}
+
+function deleteCourse(name){
+  data.courses=data.courses.filter(c=>c!==name);
+  persist();renderCourses();renderCourseSelect();
+}
+
+function renderCourses(){
+  const bar=document.getElementById('courseBar');
+  const chips=data.courses.map(c=>`
+    <div class="course-chip">
+      ${c}
+      <button class="course-chip-del" onclick="deleteCourse('${c.replace(/'/g,'\\\'')}')" title="Remove">&#215;</button>
+    </div>`).join('');
+  bar.innerHTML=`
+    ${chips}
+    <div class="course-add">
+      <input class="course-input" id="courseInput" placeholder="Add a course..." type="text">
+      <button class="fbtn" onclick="addCourse()" style="padding:5px 12px">Add</button>
+    </div>
+    <div class="course-hint">Courses appear in the dropdown when logging assignments.</div>
+  `;
+  document.getElementById('courseInput').addEventListener('keydown',e=>{if(e.key==='Enter')addCourse();});
+}
+
+function renderCourseSelect(){
+  const sel=document.getElementById('taskCourse');
+  const prev=sel.value;
+  sel.innerHTML=data.courses.length===0
+    ?'<option value="">— add courses above —</option>'
+    :['<option value="">Select course</option>',...data.courses.map(c=>`<option value="${c}">${c}</option>`)].join('');
+  if(data.courses.includes(prev)) sel.value=prev;
+}
+
+// TASKS
+function addTask(){
+  const name=document.getElementById('taskName').value.trim();
+  const course=document.getElementById('taskCourse').value;
+  const type=document.getElementById('taskType').value;
+  const due=document.getElementById('taskDue').value;
+  if(!name||!due)return;
+  data.tasks.push({id:uid(),name,course:course||'—',type,due});
+  persist();
+  document.getElementById('taskName').value='';
+  document.getElementById('taskDue').value='';
+  renderTasks();renderStats();
+}
+
+function completeTask(id){data.tasks=data.tasks.filter(t=>t.id!==id);persist();renderTasks();renderStats();}
+function deleteTask(id){data.tasks=data.tasks.filter(t=>t.id!==id);persist();renderTasks();renderStats();}
+
+function getUrgency(days){
+  if(days<0)return{cls:'overdue',color:'var(--neg)',label:Math.abs(days)+'d ago'};
+  if(days===0)return{cls:'due-today',color:'var(--navy)',label:'today'};
+  if(days<=3)return{cls:'due-soon',color:'var(--acc)',label:days+'d left'};
+  return{cls:'upcoming',color:'var(--text3)',label:days+'d left'};
+}
+
+function renderStats(){
+  const now=new Date();
+  document.getElementById('dateBadge').textContent=now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  const t=today();
+  const pd=s=>parseDate(s);
+  const overdue=data.tasks.filter(x=>pd(x.due)<t).length;
+  const dueToday=data.tasks.filter(x=>{const d=Math.round((pd(x.due)-t)/864e5);return d===0;}).length;
+  const thisWeek=data.tasks.filter(x=>{const d=Math.round((pd(x.due)-t)/864e5);return d>0&&d<=7;}).length;
+  document.getElementById('statRow').innerHTML=`
+    <div class="stat"><div class="sl">Total pending</div><div class="sv">${data.tasks.length}</div><div class="ss">assignments</div></div>
+    <div class="stat"><div class="sl">Overdue</div><div class="sv ${overdue>0?'neg':''}">${overdue}</div><div class="ss">need attention now</div></div>
+    <div class="stat"><div class="sl">Due today</div><div class="sv ${dueToday>0?'navy':''}">${dueToday}</div><div class="ss">due today</div></div>
+    <div class="stat"><div class="sl">This week</div><div class="sv">${thisWeek}</div><div class="ss">due in 7 days</div></div>
+    <div class="stat"><div class="sl">Courses</div><div class="sv">${data.courses.length}</div><div class="ss">saved</div></div>
+  `;
+}
+
+function renderTasks(){
+  const sorted=[...data.tasks].sort((a,b)=>parseDate(a.due)-parseDate(b.due));
+  const t=today();
+  const overdue=sorted.filter(x=>parseDate(x.due)<t);
+  const dueToday=sorted.filter(x=>Math.round((parseDate(x.due)-t)/864e5)===0);
+  const soon=sorted.filter(x=>{const d=Math.round((parseDate(x.due)-t)/864e5);return d>0&&d<=3;});
+  const week=sorted.filter(x=>{const d=Math.round((parseDate(x.due)-t)/864e5);return d>3&&d<=7;});
+  const upcoming=sorted.filter(x=>Math.round((parseDate(x.due)-t)/864e5)>7);
+
+  const sections=[
+    {title:'Overdue',dot:'var(--neg)',items:overdue},
+    {title:'Due today',dot:'var(--navy)',items:dueToday},
+    {title:'Next 3 days',dot:'var(--acc)',items:soon},
+    {title:'This week',dot:'var(--text3)',items:week},
+    {title:'Upcoming',dot:'var(--border2)',items:upcoming},
+  ].filter(s=>s.items.length>0||s.title==='Upcoming');
+
+  document.getElementById('taskSections').innerHTML=sections.map(sec=>{
+    const itemsHTML=sec.items.length===0
+      ?'<div class="empty-section">Nothing coming up — enjoy it while it lasts.</div>'
+      :sec.items.map(task=>{
+        const days=daysUntil(task.due);
+        const urg=getUrgency(days);
+        const tc=TYPE_COLORS[task.type]||TYPE_COLORS.other;
+        return`<div class="item ${urg.cls}">
+          <div class="item-check" onclick="completeTask('${task.id}')" title="Mark done">&#10003;</div>
+          <div class="item-body">
+            <div class="item-name">${task.name}</div>
+            <div class="item-meta">
+              <span class="item-course">${task.course}</span>
+              <span class="item-type" style="background:${tc.bg};border-color:${tc.border};color:${tc.text}">${task.type}</span>
+            </div>
+          </div>
+          <div class="item-right">
+            <div>
+              <div class="item-due" style="color:${urg.color}">${fmtDate(task.due)}</div>
+              <div class="item-days" style="color:${urg.color}">${urg.label}</div>
+            </div>
+            <button class="item-del" onclick="deleteTask('${task.id}')">&#215;</button>
+          </div>
+        </div>`;
+      }).join('');
+
+    return`<div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-title">
+          <span class="cat-dot" style="background:${sec.dot}"></span>
+          ${sec.title}
+          <span class="cat-count">${sec.items.length}</span>
+        </div>
+      </div>
+      ${itemsHTML}
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('taskName').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('taskDue').focus();});
+document.getElementById('taskDue').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
+document.getElementById('courseInput').addEventListener('keydown',e=>{if(e.key==='Enter')addCourse();});
+document.getElementById('taskDue').valueAsDate=new Date();
+
+async function init(){data=await load();renderCourses();renderCourseSelect();renderStats();renderTasks();}
+init();
+</script>
+</body>
+</html>

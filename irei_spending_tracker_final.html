@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irei — Spending Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fdf6ec;--bg2:#f7ede0;--bg3:#f0e4d0;--bg4:#e8d8be;
+  --border:#dccaa8;--border2:#c8b490;
+  --text:#1c1510;--text2:#3a2e22;--text3:#6e5e48;--text4:#9e8c74;--text5:#c8b490;
+  --acc:#166534;--neg:#dc2626;--warn:#92400e;
+  --font-serif:'DM Serif Display',serif;--font-mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-mono);min-height:100vh;padding:2rem 1.5rem 4rem}
+.header{border-bottom:1px solid var(--border2);padding-bottom:1.5rem;margin-bottom:2rem}
+.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text4);margin-bottom:6px}
+.title-row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem}
+h1{font-family:var(--font-serif);font-style:italic;font-size:30px;color:var(--text)}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text4);margin-bottom:.9rem;padding-bottom:7px;border-bottom:1px solid var(--border);margin-top:2rem}
+.lbl:first-of-type{margin-top:0}
+.sem-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2rem;background:var(--bg2);border:1px solid var(--border2);border-radius:2px;padding:.8rem 1rem}
+.sem-label{font-size:11px;color:var(--text3);flex-shrink:0}
+.sem-tabs{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.sem-tab{font-size:11px;font-family:var(--font-mono);padding:4px 12px;border-radius:2px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.sem-tab.active{background:var(--acc);color:#fff;border-color:var(--acc)}
+.sem-tab:hover:not(.active){background:var(--bg3);color:var(--text)}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1px;background:var(--border);border:1px solid var(--border2);border-radius:2px;margin-bottom:2rem;overflow:hidden}
+.stat{background:var(--bg2);padding:1.1rem 1rem}
+.sl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text4);margin-bottom:5px}
+.sv{font-family:var(--font-serif);font-size:22px;line-height:1;color:var(--text)}
+.ss{font-size:11px;color:var(--text3);margin-top:3px}
+.pos{color:var(--acc)!important}.neg{color:var(--neg)!important}.warn{color:var(--warn)!important}
+.week-nav{display:flex;align-items:center;gap:12px;margin-bottom:2rem;background:var(--bg2);border:1px solid var(--border2);border-radius:2px;padding:1rem}
+.week-btn{background:transparent;border:1px solid var(--border2);color:var(--text2);font-family:var(--font-mono);font-size:12px;padding:6px 14px;border-radius:2px;cursor:pointer;transition:all .15s}
+.week-btn:hover{background:var(--bg3);color:var(--text)}
+.week-label{font-family:var(--font-serif);font-style:italic;font-size:22px;flex:1;text-align:center;color:var(--text)}
+.week-sub{font-size:11px;color:var(--text3);text-align:center;margin-top:3px}
+.add-form{background:var(--bg2);border:1px solid var(--border2);border-radius:2px;padding:1.2rem;margin-bottom:2rem}
+.frow{display:flex;gap:8px;flex-wrap:wrap}
+.fi{background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:8px 12px;border-radius:2px;outline:none}
+.fi::placeholder{color:var(--text4)}.fi:focus{border-color:var(--text3)}
+.fi.desc{flex:2;min-width:140px}.fi.amt{width:90px}
+.fsel{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);font-family:var(--font-mono);font-size:12px;padding:8px 12px;border-radius:2px;outline:none;flex:1;min-width:140px}
+.fadd{background:var(--acc);color:#fff;border:none;font-family:var(--font-mono);font-size:12px;font-weight:500;padding:8px 18px;border-radius:2px;cursor:pointer;white-space:nowrap}
+.fadd:hover{opacity:.85}
+.form-hint{font-size:11px;color:var(--text4);margin-top:8px}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--border);border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:2rem}
+.cat-card{background:var(--bg2);padding:1.2rem}
+.cat-name{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.cat-spent{font-family:var(--font-serif);font-size:24px;margin-bottom:4px;color:var(--text)}
+.cat-budget-lbl{font-size:12px;color:var(--text3);margin-bottom:10px}
+.bar-bg{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.cat-remain{font-size:12px;font-weight:500}.cat-weekly{font-size:11px;color:var(--text3);margin-top:3px}
+.purchase-list{margin-bottom:2rem}
+.purchase-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:2px;margin-bottom:4px}
+.purchase-item:hover{background:var(--bg3)}
+.pi-cat{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);width:80px;flex-shrink:0}
+.pi-desc{flex:1;font-size:12px;color:var(--text2)}
+.pi-amt{font-size:13px;font-weight:500;color:var(--neg);white-space:nowrap}
+.pi-date{font-size:11px;color:var(--text3);white-space:nowrap}
+.pi-del{background:transparent;border:none;color:var(--text4);cursor:pointer;font-size:16px;padding:0 4px;transition:color .15s}
+.pi-del:hover{color:var(--neg)}
+.empty-state{text-align:center;padding:2rem;color:var(--text3);font-size:12px;border:1px dashed var(--border2);border-radius:2px}
+.sem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:2rem}
+.sem-card{background:var(--bg2);padding:1.2rem}
+.sem-name-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.sem-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;color:var(--text2)}
+.sem-row .sr-val{font-weight:500;color:var(--text)}
+.sem-bar-bg{height:4px;background:var(--bg4);border-radius:2px;margin-bottom:10px;overflow:hidden}
+.sem-bar-fill{height:100%;border-radius:2px;transition:width .3s}
+.pace-note{margin-top:12px;font-size:12px;color:var(--text2);line-height:1.6;padding:10px 12px;background:var(--bg3);border-radius:2px;border:1px solid var(--border)}
+.tabs{display:flex;border-bottom:1px solid var(--border2);margin-bottom:0}
+.tab{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;border-top:none;border-left:none;border-right:none;font-family:var(--font-mono);transition:all .15s}
+.tab.active{color:var(--text);border-bottom-color:var(--acc)}
+.tab-content{display:none;padding-top:1.5rem}.tab-content.visible{display:block}
+.btn{font-family:var(--font-mono);font-size:11px;padding:5px 12px;border-radius:2px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-green{background:var(--acc);color:#fff;border:1px solid var(--acc)}.btn-green:hover{opacity:.85}
+.btn-outline{background:transparent;color:var(--text3);border:1px solid var(--border2)}.btn-outline:hover{color:var(--text);border-color:var(--text3)}
+.btn-danger{background:transparent;color:var(--neg);border:1px solid rgba(220,38,38,.3)}.btn-danger:hover{background:rgba(220,38,38,.06)}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(28,21,16,.5);z-index:100;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg);border:1px solid var(--border2);border-radius:2px;padding:1.5rem;width:100%;max-width:460px;max-height:90vh;overflow-y:auto}
+.modal h2{font-family:var(--font-serif);font-style:italic;font-size:22px;margin-bottom:1.2rem;color:var(--text)}
+.modal-close{float:right;background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;margin-top:-4px}.modal-close:hover{color:var(--text)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;color:var(--text3);margin-bottom:5px;letter-spacing:.04em}
+.field input{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:8px 12px;border-radius:2px;outline:none}
+.field input:focus{border-color:var(--text3)}.field input::placeholder{color:var(--text4)}
+.modal-actions{display:flex;gap:8px;margin-top:1.2rem}
+.field-row{display:flex;gap:8px}.field-row .field{flex:1}
+.settings-section{background:var(--bg2);border:1px solid var(--border2);border-radius:2px;padding:1.2rem;margin-bottom:1rem}
+.settings-title{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.cat-setting-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cat-dot-sm{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cat-setting-name{flex:1;font-size:12px;color:var(--text2)}
+.cat-setting-budget{width:90px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:5px 8px;border-radius:2px;outline:none}
+.cat-setting-budget:focus{border-color:var(--text3)}
+.cat-del{background:transparent;border:none;color:var(--text4);cursor:pointer;font-size:14px;padding:2px 6px;transition:color .15s}.cat-del:hover{color:var(--neg)}
+.add-cat-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.add-cat-input{background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:6px 10px;border-radius:2px;outline:none}
+.add-cat-input::placeholder{color:var(--text4)}.add-cat-input:focus{border-color:var(--text3)}
+.add-cat-name{flex:1;min-width:100px}.add-cat-budget{width:80px}
+.color-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.color-swatch{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s;flex-shrink:0}
+.color-swatch.selected{border-color:var(--text)}
+.foot{font-size:10px;color:var(--text5);text-align:center;padding-top:1.5rem;border-top:1px solid var(--border);letter-spacing:.06em;margin-top:1rem}
+@media(max-width:500px){.frow{flex-direction:column}.fi.amt,.fsel{width:100%}body{padding:1.2rem 1rem 3rem}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="eyebrow">Irei Hashimoto · Rutgers</div>
+  <div class="title-row">
+    <h1>Spending Tracker</h1>
+    <div class="header-actions">
+      <button class="btn btn-outline" onclick="openSettings()">Settings</button>
+      <button class="btn btn-green" onclick="openNewSemester()">+ New semester</button>
+    </div>
+  </div>
+</div>
+
+<div class="lbl" style="margin-top:0">Semester</div>
+<div class="sem-bar">
+  <span class="sem-label">Viewing:</span>
+  <div class="sem-tabs" id="semTabs"></div>
+</div>
+
+<div class="lbl">Overview</div>
+<div class="stat-row" id="statRow"></div>
+
+<div class="lbl">Week</div>
+<div class="week-nav">
+  <button class="week-btn" onclick="changeWeek(-1)">← Prev</button>
+  <div style="flex:1"><div class="week-label" id="weekLabel">Week 1</div><div class="week-sub" id="weekSub"></div></div>
+  <button class="week-btn" onclick="changeWeek(1)">Next →</button>
+</div>
+
+<div class="lbl">Log a purchase</div>
+<div class="add-form">
+  <div class="frow">
+    <input class="fi desc" id="desc" placeholder="What did you spend on?" type="text">
+    <input class="fi amt" id="amt" placeholder="$0" type="number" min="0" step="0.01">
+    <select class="fsel" id="cat"></select>
+    <button class="fadd" onclick="addPurchase()">Add</button>
+  </div>
+  <div class="form-hint">Press Enter in amount field to add quickly</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('week')">This week</button>
+  <button class="tab" onclick="switchTab('semester')">Semester</button>
+  <button class="tab" onclick="switchTab('history')">All purchases</button>
+</div>
+<div class="tab-content visible" id="tab-week">
+  <div class="lbl" style="margin-top:1.5rem">Categories</div>
+  <div class="cat-grid" id="catGrid"></div>
+  <div class="lbl">This week</div>
+  <div id="weekPurchases"></div>
+</div>
+<div class="tab-content" id="tab-semester">
+  <div class="lbl" style="margin-top:1.5rem">Semester progress</div>
+  <div class="sem-grid" id="semGrid"></div>
+</div>
+<div class="tab-content" id="tab-history">
+  <div class="lbl" style="margin-top:1.5rem">All purchases</div>
+  <div id="allPurchases"></div>
+</div>
+
+<!-- NEW SEMESTER MODAL -->
+<div class="modal-overlay" id="newSemModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeNewSemester()">x</button>
+    <h2>New semester</h2>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:1rem;line-height:1.6">Category names and colors carry over. You can adjust budgets in Settings after.</p>
+    <div class="field"><label>Semester name</label><input type="text" id="newSemName" placeholder="e.g. Spring 2027"></div>
+    <div class="field-row">
+      <div class="field"><label>Start date</label><input type="date" id="newSemStart"></div>
+      <div class="field"><label>Weeks</label><input type="number" id="newSemWeeks" value="18" min="1" max="52"></div>
+    </div>
+    <div class="field"><label>Total budget ($) — leave blank if unsure</label><input type="number" id="newSemBudget" placeholder="e.g. 4700" min="0"></div>
+    <div class="modal-actions">
+      <button class="btn btn-green" onclick="saveNewSemester()" style="flex:1">Create semester</button>
+      <button class="btn btn-outline" onclick="closeNewSemester()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSettings()">x</button>
+    <h2>Settings</h2>
+    <div class="settings-section">
+      <div class="settings-title">Semester — <span id="settingsSemName"></span></div>
+      <div class="field-row">
+        <div class="field"><label>Start date</label><input type="date" id="settingsStart"></div>
+        <div class="field"><label>Weeks</label><input type="number" id="settingsWeeks" min="1" max="52"></div>
+      </div>
+      <div class="field"><label>Total budget ($)</label><input type="number" id="settingsBudget" min="0"></div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-title">Categories and budgets</div>
+      <div id="catSettingsList"></div>
+      <div class="add-cat-row">
+        <input class="add-cat-input add-cat-name" id="newCatName" placeholder="Category name">
+        <input class="add-cat-input add-cat-budget" id="newCatBudget" placeholder="$" type="number" min="0">
+        <button class="btn btn-green" onclick="addCategory()">Add</button>
+      </div>
+      <div class="color-row" id="newCatColorRow"></div>
+      <input type="hidden" id="newCatColor" value="#166534">
+    </div>
+    <div class="settings-section" style="border-color:rgba(220,38,38,.3)">
+      <div class="settings-title" style="color:var(--neg)">Danger zone</div>
+      <button class="btn btn-danger" onclick="deleteSemester()" style="width:100%">Delete this semester and all its data</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-green" onclick="saveSettings()" style="flex:1">Save</button>
+      <button class="btn btn-outline" onclick="closeSettings()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="foot">rutgers · irei hashimoto</div>
+
+<script>
+const CAT_COLORS=['#166534','#0f766e','#7c3aed','#b45309','#dc2626','#92400e','#1e3a5f','#9f1239','#c2410c','#4a1d96'];
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const DEFAULT={semesters:[{id:'fall2026',name:'Fall 2026',start:'2026-09-01',weeks:18,budget:4700,categories:[{id:'social',name:'Going out / social',budget:2800,color:'#166534'},{id:'food',name:'Food outside dining',budget:1200,color:'#b45309'},{id:'supplies',name:'Supplies / academic',budget:300,color:'#0f766e'},{id:'misc',name:'Miscellaneous',budget:400,color:'#7c3aed'}],purchases:[]}],activeSemId:'fall2026'};
+const SUPA_URL='https://fcgdemqeyuriwqjtvkmr.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjZ2RlbXFleXVyaXdxanR2a21yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDIzODYsImV4cCI6MjA5MzE3ODM4Nn0.CQ5y4oKZliCBGDRe1smBOg0g4llv0OE7nxdY1tLE-CY';
+const SUPA_HEADERS={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'resolution=merge-duplicates'};
+
+async function load(){
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/spending_semesters?id=eq.main&select=data`,{headers:SUPA_HEADERS});
+    const rows=await r.json();
+    if(rows&&rows.length>0&&rows[0].data) return rows[0].data;
+  }catch(e){console.log('Supabase load failed, using default',e);}
+  return JSON.parse(JSON.stringify(DEFAULT));
+}
+
+async function persist(){
+  try{
+    await fetch(`${SUPA_URL}/rest/v1/spending_semesters`,{method:'POST',headers:SUPA_HEADERS,body:JSON.stringify({id:'main',data:state,updated_at:new Date().toISOString()})});
+  }catch(e){console.log('Supabase save failed',e);}
+}
+let state=load();
+let currentWeek=1;
+function getSem(){return state.semesters.find(s=>s.id===state.activeSemId)||state.semesters[0];}
+function setCatSelect(){const sem=getSem();document.getElementById('cat').innerHTML=sem.categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');}
+const fmt=n=>'$'+Math.abs(parseFloat(n)||0).toFixed(2).replace(/\.00$/,'');
+const fmtR=n=>(n<0?'-$':'$')+Math.abs(Math.round(n)).toLocaleString();
+function getWeekDates(w){const sem=getSem();const s=new Date(sem.start);s.setDate(s.getDate()+(w-1)*7);const e=new Date(s);e.setDate(e.getDate()+6);const o={month:'short',day:'numeric'};return`${s.toLocaleDateString('en-US',o)} - ${e.toLocaleDateString('en-US',o)}`;}
+function changeWeek(d){const sem=getSem();currentWeek=Math.max(1,Math.min(sem.weeks,currentWeek+d));render();}
+function addPurchase(){
+  const desc=document.getElementById('desc').value.trim();
+  const amt=parseFloat(document.getElementById('amt').value);
+  const cat=document.getElementById('cat').value;
+  if(!desc||!amt||amt<=0)return;
+  getSem().purchases.push({id:uid(),desc,amt,cat,week:currentWeek,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});
+  persist();document.getElementById('desc').value='';document.getElementById('amt').value='';render();
+}
+function deletePurchase(id){getSem().purchases=getSem().purchases.filter(p=>p.id!==id);persist();render();}
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>{t.className='tab'+(['week','semester','history'][i]===name?' active':'');});
+  document.querySelectorAll('.tab-content').forEach(c=>{c.className='tab-content'+(c.id==='tab-'+name?' visible':'');});
+}
+function renderSemTabs(){document.getElementById('semTabs').innerHTML=state.semesters.map(s=>`<button class="sem-tab${s.id===state.activeSemId?' active':''}" onclick="switchSem('${s.id}')">${s.name}</button>`).join('');}
+function switchSem(id){state.activeSemId=id;currentWeek=1;persist();setCatSelect();renderSemTabs();render();}
+function render(){
+  const sem=getSem();
+  const total=sem.budget||sem.categories.reduce((s,c)=>s+c.budget,0);
+  const weeks=sem.weeks||18;
+  document.getElementById('weekLabel').textContent='Week '+currentWeek;
+  document.getElementById('weekSub').textContent=getWeekDates(currentWeek);
+  const wkPs=sem.purchases.filter(p=>p.week===currentWeek);
+  const allPs=sem.purchases;
+  const wTotal=wkPs.reduce((s,p)=>s+p.amt,0);
+  const sTotal=allPs.reduce((s,p)=>s+p.amt,0);
+  const sRemain=total-sTotal;
+  const wLeft=weeks-currentWeek+1;
+  const runway=wLeft>0?sRemain/wLeft:0;
+  const wBudget=total/weeks;
+  document.getElementById('statRow').innerHTML=`
+    <div class="stat"><div class="sl">Total budget</div><div class="sv">${fmtR(total)}</div><div class="ss">${weeks} weeks</div></div>
+    <div class="stat"><div class="sl">This week</div><div class="sv neg">${fmtR(wTotal)}</div><div class="ss">of ${fmtR(wBudget)} avg/wk</div></div>
+    <div class="stat"><div class="sl">Semester spent</div><div class="sv neg">${fmtR(sTotal)}</div><div class="ss">${Math.round((sTotal/Math.max(total,1))*100)}% used</div></div>
+    <div class="stat"><div class="sl">Remaining</div><div class="sv ${sRemain>=500?'pos':sRemain>=0?'warn':'neg'}">${fmtR(sRemain)}</div><div class="ss">${wLeft} wks to go</div></div>
+    <div class="stat"><div class="sl">Weekly runway</div><div class="sv ${runway>=wBudget?'pos':runway>=wBudget*.7?'warn':'neg'}">${fmtR(runway)}</div><div class="ss">per week from here</div></div>
+  `;
+  document.getElementById('catGrid').innerHTML=sem.categories.map(c=>{
+    const wSpent=wkPs.filter(p=>p.cat===c.id).reduce((s,p)=>s+p.amt,0);
+    const sSpent=allPs.filter(p=>p.cat===c.id).reduce((s,p)=>s+p.amt,0);
+    const wb=c.budget/weeks;
+    const pct=Math.min(100,(wSpent/Math.max(wb,.01))*100);
+    const over=pct>100;const rem=c.budget-sSpent;
+    return`<div class="cat-card"><div class="cat-name">${c.name}</div><div class="cat-spent ${over?'neg':''}">${fmtR(wSpent)}</div><div class="cat-budget-lbl">this week · ${fmtR(wb)} avg/wk</div><div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${over?'#dc2626':c.color}"></div></div><div class="cat-remain ${rem<0?'neg':rem<c.budget*.2?'warn':'pos'}">${fmtR(rem)} left this semester</div><div class="cat-weekly">${fmtR(sSpent)} of ${fmtR(c.budget)} used</div></div>`;
+  }).join('');
+  document.getElementById('weekPurchases').innerHTML=wkPs.length===0?'<div class="empty-state">No purchases this week yet.</div>':[...wkPs].reverse().map(p=>{const cat=sem.categories.find(c=>c.id===p.cat);return`<div class="purchase-item"><div class="pi-cat">${cat?cat.name.split(' ')[0]:'?'}</div><div class="pi-desc">${p.desc}</div><div class="pi-amt">-${fmt(p.amt)}</div><div class="pi-date">${p.date}</div><button class="pi-del" onclick="deletePurchase('${p.id}')">x</button></div>`;}).join('');
+  const expected=(currentWeek/weeks)*total;const variance=expected-sTotal;
+  document.getElementById('semGrid').innerHTML=`<div class="sem-card"><div class="sem-name-lbl">By category</div>${sem.categories.map(c=>{const sp=allPs.filter(p=>p.cat===c.id).reduce((s,p)=>s+p.amt,0);const pct=Math.min(100,(sp/Math.max(c.budget,.01))*100);return`<div class="sem-row"><span>${c.name}</span><span class="sr-val ${pct>100?'neg':''}">${fmtR(sp)} / ${fmtR(c.budget)}</span></div><div class="sem-bar-bg"><div class="sem-bar-fill" style="width:${pct}%;background:${pct>100?'#dc2626':c.color}"></div></div>`;}).join('')}<div class="sem-row" style="border-top:1px solid var(--border2);padding-top:8px;margin-top:4px"><span style="font-weight:500">Total</span><span class="sr-val ${sTotal>total?'neg':''}">${fmtR(sTotal)} / ${fmtR(total)}</span></div></div><div class="sem-card"><div class="sem-name-lbl">Pace — week ${currentWeek} of ${weeks}</div><div class="sem-row"><span>Expected by now</span><span class="sr-val warn">${fmtR(expected)}</span></div><div class="sem-row"><span>Actually spent</span><span class="sr-val ${sTotal>expected?'neg':'pos'}">${fmtR(sTotal)}</span></div><div class="sem-row"><span>Variance</span><span class="sr-val ${variance<0?'neg':'pos'}">${variance>=0?'+':''}${fmtR(variance)}</span></div><div class="sem-bar-bg" style="margin-top:8px"><div class="sem-bar-fill" style="width:${Math.min(100,(sTotal/Math.max(total,1))*100)}%;background:${sTotal>total?'#dc2626':'#166534'}"></div></div><div style="font-size:11px;color:var(--text3);margin-top:5px">${Math.round((sTotal/Math.max(total,1))*100)}% of semester budget used</div><div class="pace-note">${variance>=0?'<strong style="color:#166534">'+fmtR(variance)+' under pace</strong> — at this rate you finish with '+fmtR(sRemain)+' remaining.':'<strong style="color:#dc2626">'+fmtR(Math.abs(variance))+' over pace</strong> — slow down or you will run out by week '+Math.round((total/Math.max(sTotal,1))*currentWeek)+'.'}</div></div>`;
+  document.getElementById('allPurchases').innerHTML=allPs.length===0?'<div class="empty-state">No purchases yet.</div>':[...allPs].reverse().map(p=>{const cat=sem.categories.find(c=>c.id===p.cat);return`<div class="purchase-item"><div class="pi-cat">${cat?cat.name.split(' ')[0]:'?'}</div><div class="pi-desc">${p.desc} <span style="color:var(--text4);font-size:10px">Wk ${p.week}</span></div><div class="pi-amt">-${fmt(p.amt)}</div><div class="pi-date">${p.date}</div><button class="pi-del" onclick="deletePurchase('${p.id}')">x</button></div>`;}).join('');
+}
+function openNewSemester(){document.getElementById('newSemName').value='';document.getElementById('newSemStart').value='';document.getElementById('newSemWeeks').value='18';document.getElementById('newSemBudget').value='';document.getElementById('newSemModal').classList.add('open');setTimeout(()=>document.getElementById('newSemName').focus(),100);}
+function closeNewSemester(){document.getElementById('newSemModal').classList.remove('open');}
+function saveNewSemester(){
+  const name=document.getElementById('newSemName').value.trim();if(!name)return;
+  const prev=getSem();
+  const cats=prev.categories.map(c=>({...c,id:uid()}));
+  const budget=parseFloat(document.getElementById('newSemBudget').value)||0;
+  const newSem={id:uid(),name,start:document.getElementById('newSemStart').value||new Date().toISOString().split('T')[0],weeks:parseInt(document.getElementById('newSemWeeks').value)||18,budget,categories:cats,purchases:[]};
+  state.semesters.push(newSem);state.activeSemId=newSem.id;currentWeek=1;
+  persist();closeNewSemester();setCatSelect();renderSemTabs();render();
+}
+function openSettings(){
+  const sem=getSem();
+  document.getElementById('settingsSemName').textContent=sem.name;
+  document.getElementById('settingsStart').value=sem.start;
+  document.getElementById('settingsWeeks').value=sem.weeks;
+  document.getElementById('settingsBudget').value=sem.budget;
+  renderCatSettings();renderNewCatColors();
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettings(){document.getElementById('settingsModal').classList.remove('open');}
+function renderCatSettings(){
+  document.getElementById('catSettingsList').innerHTML=getSem().categories.map(c=>`<div class="cat-setting-row"><span class="cat-dot-sm" style="background:${c.color}"></span><span class="cat-setting-name">${c.name}</span><input class="cat-setting-budget" type="number" value="${c.budget}" min="0" onchange="updateCatBudget('${c.id}',this.value)"><button class="cat-del" onclick="deleteCategory('${c.id}')">x</button></div>`).join('');
+}
+function renderNewCatColors(){
+  const sel=document.getElementById('newCatColor').value;
+  document.getElementById('newCatColorRow').innerHTML=CAT_COLORS.map(c=>`<div class="color-swatch${c===sel?' selected':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`).join('');
+}
+function pickColor(c){document.getElementById('newCatColor').value=c;renderNewCatColors();}
+function updateCatBudget(id,val){const cat=getSem().categories.find(c=>c.id===id);if(cat)cat.budget=parseFloat(val)||0;}
+function deleteCategory(id){if(!confirm('Remove this category?'))return;getSem().categories=getSem().categories.filter(c=>c.id!==id);persist();renderCatSettings();}
+function addCategory(){
+  const name=document.getElementById('newCatName').value.trim();
+  const budget=parseFloat(document.getElementById('newCatBudget').value)||0;
+  const color=document.getElementById('newCatColor').value;
+  if(!name)return;
+  getSem().categories.push({id:uid(),name,budget,color});
+  document.getElementById('newCatName').value='';document.getElementById('newCatBudget').value='';
+  persist();renderCatSettings();setCatSelect();
+}
+function saveSettings(){
+  const sem=getSem();
+  sem.start=document.getElementById('settingsStart').value||sem.start;
+  sem.weeks=parseInt(document.getElementById('settingsWeeks').value)||sem.weeks;
+  sem.budget=parseFloat(document.getElementById('settingsBudget').value)||sem.budget;
+  persist();closeSettings();setCatSelect();render();
+}
+function deleteSemester(){
+  if(state.semesters.length<=1){alert('Need at least one semester.');return;}
+  if(!confirm('Delete this semester and all its data?'))return;
+  state.semesters=state.semesters.filter(s=>s.id!==getSem().id);
+  state.activeSemId=state.semesters[state.semesters.length-1].id;
+  currentWeek=1;persist();closeSettings();setCatSelect();renderSemTabs();render();
+}
+['newSemModal','settingsModal'].forEach(id=>{document.getElementById(id).addEventListener('click',e=>{if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');});});
+document.getElementById('amt').addEventListener('keydown',e=>{if(e.key==='Enter')addPurchase();});
+document.getElementById('desc').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('amt').focus();});
+async function init(){state=await load();setCatSelect();renderSemTabs();render();}
+init();
+</script>
+</body>
+</html>
