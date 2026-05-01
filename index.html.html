@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irei — Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fdf6ec;--bg2:#f7ede0;--bg3:#f0e4d0;--bg4:#e8d8be;
+  --border:#dccaa8;--border2:#c8b490;
+  --text:#1c1510;--text2:#3a2e22;--text3:#6e5e48;--text4:#9e8c74;--text5:#c8b490;
+  --acc:#166534;--neg:#dc2626;--warn:#92400e;
+  --font-serif:'DM Serif Display',serif;--font-mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-mono);min-height:100vh;padding:2rem 1.5rem 4rem}
+.header{border-bottom:1px solid var(--border2);padding-bottom:1.5rem;margin-bottom:2rem}
+.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text4);margin-bottom:6px}
+.title-row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem}
+h1{font-family:var(--font-serif);font-style:italic;font-size:36px;color:var(--text)}
+.date{font-size:11px;color:var(--text3)}
+.greeting{font-size:12px;color:var(--text3);margin-top:1rem;line-height:1.6}
+.lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text4);margin-bottom:.9rem;padding-bottom:7px;border-bottom:1px solid var(--border);margin-top:2rem}
+.lbl:first-of-type{margin-top:0}
+.quick-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--border);border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:2rem}
+.qs{background:var(--bg2);padding:1rem}
+.qs-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text4);margin-bottom:4px}
+.qs-value{font-family:var(--font-serif);font-size:20px;color:var(--text)}
+.qs-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:var(--border);border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:.5rem}
+.tool-card{background:var(--bg2);padding:1.4rem;cursor:pointer;transition:background .15s;text-decoration:none;display:block;position:relative}
+.tool-card:hover{background:var(--bg3)}
+.tool-card:hover .tool-arrow{opacity:1;transform:translateX(0)}
+.tool-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;flex-shrink:0}
+.tool-cat{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text4);margin-bottom:10px;display:flex;align-items:center}
+.tool-name{font-family:var(--font-serif);font-style:italic;font-size:20px;color:var(--text);margin-bottom:6px;line-height:1.2}
+.tool-desc{font-size:11px;color:var(--text3);line-height:1.6;padding-right:1.5rem}
+.tool-arrow{position:absolute;top:1.4rem;right:1.4rem;font-size:16px;color:var(--text4);opacity:0;transform:translateX(-4px);transition:all .15s}
+.tool-del{position:absolute;bottom:.8rem;right:.8rem;background:transparent;border:1px solid transparent;color:var(--text5);cursor:pointer;font-size:11px;padding:3px 8px;border-radius:2px;font-family:var(--font-mono);transition:all .15s;opacity:0}
+.tool-card:hover .tool-del{opacity:1}
+.tool-del:hover{color:var(--neg);border-color:rgba(220,38,38,.3);background:rgba(220,38,38,.06)}
+.cat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem;padding-bottom:7px;border-bottom:1px solid var(--border);margin-top:2rem}
+.cat-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text4);display:flex;align-items:center;gap:8px}
+.cat-count{font-size:10px;color:var(--text4);background:var(--bg3);padding:2px 8px;border-radius:10px;border:1px solid var(--border)}
+.cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cat-actions{display:flex;gap:6px}
+.btn{font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:2px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-green{background:var(--acc);color:#fff;border:1px solid var(--acc)}.btn-green:hover{opacity:.85}
+.btn-outline{background:transparent;color:var(--text3);border:1px solid var(--border2)}.btn-outline:hover{color:var(--text);border-color:var(--text3)}
+.btn-danger{background:transparent;color:var(--neg);border:1px solid rgba(220,38,38,.3)}.btn-danger:hover{background:rgba(220,38,38,.06)}
+.top-bar{display:flex;justify-content:flex-end;margin-bottom:.5rem}
+.empty-cat{font-size:12px;color:var(--text4);padding:1.2rem;background:var(--bg2);border:1px dashed var(--border);border-radius:2px;text-align:center;grid-column:1/-1}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(28,21,16,.5);z-index:100;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg);border:1px solid var(--border2);border-radius:2px;padding:1.5rem;width:100%;max-width:440px;max-height:90vh;overflow-y:auto}
+.modal h2{font-family:var(--font-serif);font-style:italic;font-size:22px;margin-bottom:1.2rem;color:var(--text)}
+.modal-close{float:right;background:transparent;border:none;color:var(--text3);font-size:20px;cursor:pointer;margin-top:-4px}.modal-close:hover{color:var(--text)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;color:var(--text3);margin-bottom:5px;letter-spacing:.04em}
+.field input,.field textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:8px 12px;border-radius:2px;outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--text3)}
+.field textarea{resize:vertical;min-height:60px}
+.field input::placeholder,.field textarea::placeholder{color:var(--text4)}
+.modal-actions{display:flex;gap:8px;margin-top:1.2rem}
+.color-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.color-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s}
+.color-swatch.selected{border-color:var(--text)}
+.foot{font-size:10px;color:var(--text5);text-align:center;padding-top:1.5rem;border-top:1px solid var(--border);letter-spacing:.06em;margin-top:2rem}
+@media(max-width:500px){body{padding:1.2rem 1rem 3rem}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="eyebrow">Irei Hashimoto</div>
+  <div class="title-row">
+    <h1>My Hub</h1>
+    <div class="date" id="dateDisplay"></div>
+  </div>
+  <div class="greeting" id="greeting"></div>
+</div>
+
+<div class="lbl" style="margin-top:0">Quick stats</div>
+<div class="quick-stats" id="quickStats"></div>
+
+<div class="top-bar">
+  <button class="btn btn-outline" onclick="openAddCat()">+ Add category</button>
+</div>
+
+<div id="sections"></div>
+
+<!-- ADD TOOL MODAL -->
+<div class="modal-overlay" id="toolModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeToolModal()">×</button>
+    <h2>Add tool</h2>
+    <input type="hidden" id="toolCat">
+    <div class="field"><label>Name</label><input type="text" id="toolName" placeholder="e.g. Grade Tracker"></div>
+    <div class="field"><label>Description</label><textarea id="toolDesc" placeholder="What does this tool do?"></textarea></div>
+    <div class="field"><label>Filename — must be in same folder as hub</label><input type="text" id="toolFile" placeholder="e.g. irei_grade_tracker.html"></div>
+    <div class="modal-actions">
+      <button class="btn btn-green" onclick="saveTool()" style="flex:1">Add tool</button>
+      <button class="btn btn-outline" onclick="closeToolModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CATEGORY MODAL -->
+<div class="modal-overlay" id="catModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeCatModal()">×</button>
+    <h2>Add category</h2>
+    <div class="field"><label>Name</label><input type="text" id="catName" placeholder="e.g. Formula SAE"></div>
+    <div class="field"><label>Color</label><div class="color-row" id="colorRow"></div><input type="hidden" id="catColor" value="#166534"></div>
+    <div class="modal-actions">
+      <button class="btn btn-green" onclick="saveCat()" style="flex:1">Add category</button>
+      <button class="btn btn-outline" onclick="closeCatModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="foot">irei hashimoto · 2026</div>
+
+<script>
+const COLORS=['#166534','#0f766e','#7c3aed','#b45309','#dc2626','#92400e','#1e3a5f','#9f1239','#c2410c','#4a1d96','#0c4a6e','#1a5e3a'];
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+
+const DEFAULTS={
+  cats:[
+    {id:'finance',name:'Personal finance',color:'#166534'},
+    {id:'academic',name:'Academic',color:'#0f766e'},
+  ],
+  tools:[
+    {id:'budget',name:'Summer Budget',desc:'Income projections, spending cuts, Rutgers cushion, and month by month cash flow.',file:'irei_budget_final_theme.html',cat:'finance'},
+    {id:'spending',name:'Spending Tracker',desc:'Log purchases by category, track weekly pace, and monitor semester progress.',file:'irei_spending_tracker_final.html',cat:'finance'},
+    {id:'assignments',name:'Assignment Tracker',desc:'Deadlines sorted by urgency. Mark complete and they disappear.',file:'irei_assignment_tracker_final.html',cat:'academic'},
+  ]
+};
+
+let data=DEFAULTS;
+
+const SUPA_URL='https://fcgdemqeyuriwqjtvkmr.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjZ2RlbXFleXVyaXdxanR2a21yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDIzODYsImV4cCI6MjA5MzE3ODM4Nn0.CQ5y4oKZliCBGDRe1smBOg0g4llv0OE7nxdY1tLE-CY';
+const SUPA_HEADERS={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'resolution=merge-duplicates'};
+async function save(){
+  try{await fetch(`${SUPA_URL}/rest/v1/hub_data`,{method:'POST',headers:SUPA_HEADERS,body:JSON.stringify({id:'main',data,updated_at:new Date().toISOString()})});}
+  catch(e){console.log('Save failed',e);}
+}
+
+async function renderStats(){
+  let tasks=[],weekSpend=0,weeksIn=0,weeksLeft=0;
+  try{
+    const now=new Date();
+    const semStart=new Date('2026-09-01');
+    const msWeek=864e5*7;
+    weeksIn=Math.max(0,Math.floor((now-semStart)/msWeek)+1);
+    weeksLeft=Math.max(0,Math.ceil((new Date('2027-01-15')-now)/msWeek));
+    const [taskRes,trackerRes]=await Promise.all([
+      fetch(`${SUPA_URL}/rest/v1/assignments?id=eq.main&select=data`,{headers:SUPA_HEADERS}),
+      fetch(`${SUPA_URL}/rest/v1/spending_semesters?id=eq.main&select=data`,{headers:SUPA_HEADERS})
+    ]);
+    const taskRows=await taskRes.json();
+    const trackerRows=await trackerRes.json();
+    if(taskRows&&taskRows.length>0&&taskRows[0].data) tasks=taskRows[0].data.tasks||[];
+    if(trackerRows&&trackerRows.length>0&&trackerRows[0].data){
+      const tracker=trackerRows[0].data;
+      const sem=tracker.semesters&&tracker.semesters.find(s=>s.id===tracker.activeSemId);
+      if(sem) weekSpend=(sem.purchases||[]).filter(p=>p.week===weeksIn).reduce((s,p)=>s+p.amt,0);
+    }
+  }catch(e){console.log('Stats load failed',e);}
+  const today=new Date();today.setHours(0,0,0,0);
+  const pd=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
+  const overdue=tasks.filter(t=>pd(t.due)<today).length;
+  const dueWk=tasks.filter(t=>{const diff=Math.round((pd(t.due)-today)/864e5);return diff>=0&&diff<=7;}).length;
+  document.getElementById('quickStats').innerHTML=`
+    <div class="qs"><div class="qs-label">Semester week</div><div class="qs-value">${weeksIn>0&&weeksIn<=18?weeksIn:'—'}</div><div class="qs-sub">${weeksLeft} weeks left</div></div>
+    <div class="qs"><div class="qs-label">Assignments</div><div class="qs-value" style="color:${overdue>0?'var(--neg)':'var(--text)'}">${tasks.length}</div><div class="qs-sub">${overdue>0?overdue+' overdue':'none overdue'}</div></div>
+    <div class="qs"><div class="qs-label">Due this week</div><div class="qs-value" style="color:${dueWk>3?'var(--warn)':'var(--text)'}">${dueWk}</div><div class="qs-sub">assignments</div></div>
+    <div class="qs"><div class="qs-label">Spent this week</div><div class="qs-value" style="color:${weekSpend>250?'var(--neg)':weekSpend>150?'var(--warn)':'var(--text)'}">$${Math.round(weekSpend)}</div><div class="qs-sub">this week</div></div>
+    <div class="qs"><div class="qs-label">Tools</div><div class="qs-value">${data.tools.length}</div><div class="qs-sub">${data.cats.length} categories</div></div>
+  `;
+}
+
+function renderSections(){
+  const c=document.getElementById('sections');
+  c.innerHTML='';
+  if(data.cats.length===0){c.innerHTML='<div style="text-align:center;padding:3rem;color:var(--text4);font-size:12px">No categories yet. Click + Add category to start.</div>';return;}
+  data.cats.forEach(cat=>{
+    const tools=data.tools.filter(t=>t.cat===cat.id);
+    const sec=document.createElement('div');
+    const hdr=document.createElement('div');
+    hdr.className='cat-header';
+    hdr.innerHTML=`
+      <div class="cat-title"><span class="cat-dot" style="background:${cat.color}"></span>${cat.name}<span class="cat-count">${tools.length}</span></div>
+      <div class="cat-actions">
+        <button class="btn btn-outline" onclick="openAddTool('${cat.id}')">+ Add tool</button>
+        <button class="btn btn-danger" onclick="deleteCat('${cat.id}')">Remove</button>
+      </div>`;
+    sec.appendChild(hdr);
+    const grid=document.createElement('div');
+    grid.className='tool-grid';
+    if(tools.length===0){grid.innerHTML='<div class="empty-cat">No tools yet — click + Add tool above.</div>';}
+    else{
+      tools.forEach(t=>{
+        const card=document.createElement('a');
+        card.className='tool-card';
+        card.href=t.file;
+        card.innerHTML=`
+          <div class="tool-cat"><span class="tool-dot" style="background:${cat.color}"></span>${cat.name}</div>
+          <div class="tool-name">${t.name}</div>
+          <div class="tool-desc">${t.desc}</div>
+          <div class="tool-arrow">→</div>
+          <button class="tool-del" onclick="event.preventDefault();event.stopPropagation();deleteTool('${t.id}')">Remove</button>`;
+        grid.appendChild(card);
+      });
+    }
+    sec.appendChild(grid);
+    c.appendChild(sec);
+  });
+}
+
+function render(){renderStats();renderSections();}
+
+function openAddTool(catId){
+  document.getElementById('toolCat').value=catId;
+  document.getElementById('toolName').value='';
+  document.getElementById('toolDesc').value='';
+  document.getElementById('toolFile').value='';
+  document.getElementById('toolModal').classList.add('open');
+  setTimeout(()=>document.getElementById('toolName').focus(),100);
+}
+function closeToolModal(){document.getElementById('toolModal').classList.remove('open');}
+function saveTool(){
+  const name=document.getElementById('toolName').value.trim();
+  const file=document.getElementById('toolFile').value.trim();
+  if(!name||!file)return;
+  data.tools.push({id:uid(),name,desc:document.getElementById('toolDesc').value.trim(),file,cat:document.getElementById('toolCat').value});
+  save();closeToolModal();render();
+}
+
+function openAddCat(){
+  document.getElementById('catName').value='';
+  document.getElementById('catColor').value=COLORS[0];
+  renderSwatches();
+  document.getElementById('catModal').classList.add('open');
+  setTimeout(()=>document.getElementById('catName').focus(),100);
+}
+function closeCatModal(){document.getElementById('catModal').classList.remove('open');}
+function renderSwatches(){
+  const sel=document.getElementById('catColor').value;
+  document.getElementById('colorRow').innerHTML=COLORS.map(c=>`<div class="color-swatch${c===sel?' selected':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`).join('');
+}
+function pickColor(c){document.getElementById('catColor').value=c;renderSwatches();}
+function saveCat(){
+  const name=document.getElementById('catName').value.trim();
+  if(!name)return;
+  data.cats.push({id:uid(),name,color:document.getElementById('catColor').value});
+  save();closeCatModal();render();
+}
+
+function deleteCat(id){
+  const cat=data.cats.find(c=>c.id===id);
+  const n=data.tools.filter(t=>t.cat===id).length;
+  if(!confirm(`Remove "${cat.name}"${n>0?` and its ${n} tool${n!==1?'s':''}`:''}`+'?'))return;
+  data.cats=data.cats.filter(c=>c.id!==id);
+  data.tools=data.tools.filter(t=>t.cat!==id);
+  save();render();
+}
+function deleteTool(id){
+  const t=data.tools.find(t=>t.id===id);
+  if(!confirm(`Remove "${t.name}"?`))return;
+  data.tools=data.tools.filter(x=>x.id!==id);
+  save();render();
+}
+
+function renderHeader(){
+  const now=new Date();
+  document.getElementById('dateDisplay').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const h=now.getHours();
+  const msgs={morning:['Good morning. What needs to get done today?','Start with the hardest thing first.','Check your deadlines before anything else.'],afternoon:['Afternoon. How is the day tracking?','Keep the momentum going.','What still needs to happen today?'],evening:['Evening. Log today\'s spending before you forget.','Check tomorrow\'s deadlines.','How did today go?'],night:['Late night. Get some sleep.','Tomorrow needs you rested.','You should probably be sleeping.']};
+  const p=h<12?'morning':h<17?'afternoon':h<21?'evening':'night';
+  const list=msgs[p];
+  document.getElementById('greeting').textContent=list[Math.floor(Math.random()*list.length)];
+}
+
+['toolModal','catModal'].forEach(id=>{document.getElementById(id).addEventListener('click',e=>{if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');});});
+document.getElementById('catName').addEventListener('keydown',e=>{if(e.key==='Enter')saveCat();});
+document.getElementById('toolFile').addEventListener('keydown',e=>{if(e.key==='Enter')saveTool();});
+
+async function init(){
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/hub_data?id=eq.main&select=data`,{headers:SUPA_HEADERS});
+    const rows=await r.json();
+    if(rows&&rows.length>0&&rows[0].data) data=rows[0].data;
+  }catch(e){console.log('Hub load failed',e);}
+  renderHeader();render();
+}
+init();
+</script>
+</body>
+</html>
