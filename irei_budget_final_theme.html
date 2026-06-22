@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irei — Summer Budget</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fdf6ec;--bg2:#f7ede0;--bg3:#f0e4d0;--bg4:#e8d8be;
+  --border:#dccaa8;--border2:#c8b490;
+  --text:#1c1510;--text2:#3a2e22;--text3:#6e5e48;--text4:#9e8c74;--text5:#c8b490;
+  --acc:#166534;--neg:#dc2626;--warn:#92400e;--navy:#1e3a5f;
+  --font-serif:'DM Serif Display',serif;--font-mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-mono);min-height:100vh;padding:2rem 1.5rem 4rem}
+.header{border-bottom:1px solid var(--border2);padding-bottom:1.5rem;margin-bottom:2rem}
+.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text4);margin-bottom:6px}
+h1{font-family:var(--font-serif);font-style:italic;font-size:32px;color:var(--text)}
+.lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text4);margin-bottom:.9rem;padding-bottom:7px;border-bottom:1px solid var(--border);margin-top:2rem}
+.lbl:first-of-type{margin-top:0}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:1px;background:var(--border);border:1px solid var(--border2);border-radius:2px;margin-bottom:2rem;overflow:hidden}
+.stat{background:var(--bg2);padding:1.1rem 1rem}
+.sl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text4);margin-bottom:5px}
+.sv{font-family:var(--font-serif);font-size:22px;line-height:1;color:var(--text)}
+.ss{font-size:11px;color:var(--text3);margin-top:3px}
+.pos{color:var(--acc)!important}.neg{color:var(--neg)!important}.warn{color:var(--warn)!important}.navy{color:var(--navy)!important}
+.meter-wrap{margin-bottom:2rem;background:var(--bg2);border:1px solid var(--border2);border-radius:2px;padding:1.2rem}
+.meter-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.meter-top span:first-child{font-size:12px;color:var(--text2)}
+.meter-top span:last-child{font-size:20px;font-family:var(--font-serif)}
+.meter-bg{height:10px;background:var(--bg4);border-radius:5px;margin-bottom:8px;overflow:hidden}
+.meter-fill{height:100%;border-radius:5px;transition:width .4s,background .4s}
+.meter-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--text3)}
+.meter-note{font-size:12px;color:var(--text2);margin-top:10px;line-height:1.6;padding-top:10px;border-top:1px solid var(--border)}
+/* income and spend grids use spending-grid class */
+.bars{margin-bottom:2rem}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-lbl{font-size:12px;color:var(--text2);width:44px;text-align:right;flex-shrink:0}
+.bar-bg{flex:1;height:24px;background:var(--bg3);border-radius:2px;overflow:hidden;border:1px solid var(--border)}
+.bar-fill{height:100%;display:flex;align-items:center;padding-left:10px;font-size:11px;color:#fff;font-weight:500;border-radius:2px;transition:width .4s}
+.bar-pos{background:var(--acc)}.bar-neg{background:var(--neg)}
+.add-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.fi{background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:8px 12px;border-radius:2px;outline:none}
+.fi::placeholder{color:var(--text4)}.fi:focus{border-color:var(--text3)}
+.fi.grow{flex:2;min-width:140px}.fi.w90{width:90px}
+.fsel{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);font-family:var(--font-mono);font-size:12px;padding:8px 12px;border-radius:2px;outline:none;flex:1;min-width:120px}
+.btn{font-family:var(--font-mono);font-size:11px;padding:7px 14px;border-radius:2px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-sm{padding:4px 10px;font-size:10px}
+.btn-green{background:var(--acc);color:#fff;border:1px solid var(--acc)}.btn-green:hover{opacity:.85}
+.shop-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:2px;margin-bottom:5px;transition:background .15s}
+.shop-item:hover{background:var(--bg3)}
+.shop-item.bought{opacity:.45}
+.shop-check{width:18px;height:18px;border-radius:3px;border:1px solid var(--border2);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .15s}
+.shop-check:hover{border-color:var(--acc);color:rgba(22,101,52,.4)}
+.shop-item.bought .shop-check{background:var(--acc);border-color:var(--acc);color:#fff}
+.shop-name{flex:1;font-size:12px;color:var(--text2)}
+.shop-item.bought .shop-name{text-decoration:line-through;color:var(--text4)}
+.shop-cat{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text4);width:80px;flex-shrink:0}
+.shop-price{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap}
+.shop-del{background:transparent;border:none;color:var(--text5);cursor:pointer;font-size:14px;padding:0 4px;transition:color .15s}
+.shop-del:hover{color:var(--neg)}
+.shop-progress{font-size:11px;color:var(--text3);margin-bottom:1rem;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:2px}
+.shop-progress span{color:var(--acc);font-weight:500}
+.empty-state{text-align:center;padding:2rem;color:var(--text3);font-size:12px;border:1px dashed var(--border2);border-radius:2px}
+.spending-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--border);border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:1rem}
+.spend-cell{background:var(--bg2);padding:1rem}
+.spend-name-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.spend-name{font-size:11px;color:var(--text3);flex:1}
+.spend-del{background:transparent;border:none;color:var(--text5);cursor:pointer;font-size:13px;padding:0 3px;transition:color .15s}
+.spend-del:hover{color:var(--neg)}
+.spend-amt-input{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:var(--font-serif);font-size:20px;padding:4px 8px;border-radius:2px;outline:none;text-align:right}
+.spend-amt-input:focus{border-color:var(--text3)}
+.spend-weekly{font-size:10px;color:var(--text4);margin-top:4px}
+.add-spend-row{display:flex;gap:8px;margin-bottom:2rem;flex-wrap:wrap}
+.debt-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border2);border-radius:2px;overflow:hidden;margin-bottom:2rem}
+.debt-cell{background:var(--bg2);padding:1.1rem}
+.debt-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text4);margin-bottom:5px}
+.debt-amt{font-family:var(--font-serif);font-size:22px;color:var(--neg);margin-bottom:5px}
+.debt-note{font-size:12px;color:var(--text2);line-height:1.5}
+.rules-box{background:var(--bg2);border:1px solid var(--border2);border-radius:2px;padding:1.2rem;margin-bottom:2rem}
+.rule{display:flex;gap:12px;margin-bottom:10px;font-size:12px;color:var(--text2);line-height:1.6}
+.rule:last-child{margin-bottom:0}
+.rn{color:var(--acc);font-weight:500;flex-shrink:0;width:18px}
+.rule span{color:var(--text);font-weight:500}
+.foot{font-size:10px;color:var(--text5);text-align:center;padding-top:1.5rem;border-top:1px solid var(--border);letter-spacing:.06em}
+@media(max-width:480px){.debt-grid{grid-template-columns:1fr}body{padding:1.2rem 1rem 3rem}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="eyebrow">Irei Hashimoto · Summer 2026</div>
+  <h1>Budget</h1>
+</div>
+
+<div class="lbl">Summary</div>
+<div class="stat-row" id="statRow"></div>
+
+<div class="lbl">Safety meter — Rutgers cushion</div>
+<div class="meter-wrap">
+  <div class="meter-top"><span>Going into freshman year</span><span id="cushionAmt">—</span></div>
+  <div class="meter-bg"><div class="meter-fill" id="meterFill"></div></div>
+  <div class="meter-scale"><span>$0 danger</span><span>$1,500 okay</span><span>$3,000 safe</span></div>
+  <div class="meter-note" id="safetyNote"></div>
+</div>
+
+<div class="lbl">Income sources</div>
+<div class="spending-grid" id="incomeGrid"></div>
+<div class="add-spend-row">
+  <input class="fi grow" id="incomeName" placeholder="Income source name" type="text">
+  <input class="fi w90" id="incomeAmt" placeholder="$" type="number" min="0">
+  <button class="btn btn-green" onclick="addIncomeSource()">Add</button>
+</div>
+
+<div class="lbl">Running balance</div>
+<div class="bars" id="bars"></div>
+
+<div class="lbl">Debts — clear these first</div>
+<div class="debt-grid">
+  <div class="debt-cell"><div class="debt-lbl">Parent debt</div><div class="debt-amt">-$250</div><div class="debt-note">Clear from first paycheck. Non-negotiable.</div></div>
+  <div class="debt-cell"><div class="debt-lbl">TV repair (remaining)</div><div class="debt-amt">-$250</div><div class="debt-note">PC sale covers half. Remainder from first deposit.</div></div>
+</div>
+
+<div class="lbl">Pre-Rutgers shopping list</div>
+<div class="add-row">
+  <input class="fi grow" id="shopName" placeholder="Item name" type="text">
+  <input class="fi w90" id="shopPrice" placeholder="$" type="number" min="0" step="1">
+  <select class="fsel" id="shopCat">
+    <option value="Wardrobe">Wardrobe</option>
+    <option value="Tech">Tech</option>
+    <option value="Shoes">Shoes</option>
+    <option value="Grooming">Grooming</option>
+    <option value="Skincare">Skincare</option>
+    <option value="Health">Health</option>
+    <option value="Dorm">Dorm</option>
+    <option value="Sports">Sports</option>
+    <option value="Personal">Personal</option>
+    <option value="Other">Other</option>
+  </select>
+  <button class="btn btn-green" onclick="addShopItem()">Add</button>
+</div>
+<div id="shopProgress"></div>
+<div id="shopList"></div>
+
+<div class="lbl">College year spending</div>
+<div class="spending-grid" id="spendGrid"></div>
+<div class="add-spend-row">
+  <input class="fi grow" id="spendName" placeholder="Category name" type="text">
+  <input class="fi w90" id="spendAmt" placeholder="$" type="number" min="0">
+  <button class="btn btn-green" onclick="addSpendCat()">Add</button>
+</div>
+
+<div class="lbl">Rules — non-negotiable</div>
+<div class="rules-box">
+  <div class="rule"><div class="rn">01</div><div><span>$500 debt</span> cleared from first money in. Before anything else.</div></div>
+  <div class="rule"><div class="rn">02</div><div><span>Phone ($350)</span> is first purchase after debt is cleared.</div></div>
+  <div class="rule"><div class="rn">03</div><div><span>$500 buffer</span> is untouchable. The TV is exactly why this exists.</div></div>
+  <div class="rule"><div class="rn">04</div><div><span>Bonuses are upside.</span> Plan around base fees + camp only.</div></div>
+  <div class="rule"><div class="rn">05</div><div><span>No shopping list spending</span> until first paycheck is in hand.</div></div>
+</div>
+
+<div class="foot">summer 2026</div>
+
+<script>
+const DEBT=500,BUFFER=500;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const fmt=n=>(n<0?'-$':'$')+Math.abs(Math.round(n)).toLocaleString();
+
+const DEFAULT={
+  income:[],
+  shop:[
+    {id:'s1',name:'Phone',price:350,cat:'Tech',bought:false},
+    {id:'s2',name:'Wardrobe (core)',price:500,cat:'Wardrobe',bought:false},
+    {id:'s3',name:'New Balance 550',price:100,cat:'Shoes',bought:false},
+    {id:'s4',name:'Grooming essentials',price:90,cat:'Grooming',bought:false},
+    {id:'s5',name:'Skincare',price:118,cat:'Skincare',bought:false},
+    {id:'s6',name:'Glasses (Zenni)',price:80,cat:'Personal',bought:false},
+    {id:'s7',name:'Slim wallet',price:30,cat:'Personal',bought:false},
+    {id:'s8',name:'Water bottle',price:25,cat:'Personal',bought:false},
+    {id:'s9',name:'Skateboard setup',price:150,cat:'Sports',bought:false},
+    {id:'s10',name:'Dorm essentials',price:82,cat:'Dorm',bought:false},
+  ],
+  spend:[
+    {id:'c1',name:'Going out / social',amt:2000},
+    {id:'c2',name:'Frat / greek life',amt:1000},
+    {id:'c3',name:'NYC + concerts',amt:600},
+    {id:'c4',name:'Snowboard trips',amt:200},
+    {id:'c5',name:'Haircuts',amt:200},
+    {id:'c6',name:'Food outside dining',amt:1200},
+    {id:'c7',name:'Supplies / academic',amt:300},
+    {id:'c8',name:'Miscellaneous',amt:400},
+  ]
+};
+
+const SUPA_URL='https://fcgdemqeyuriwqjtvkmr.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjZ2RlbXFleXVyaXdxanR2a21yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDIzODYsImV4cCI6MjA5MzE3ODM4Nn0.CQ5y4oKZliCBGDRe1smBOg0g4llv0OE7nxdY1tLE-CY';
+const SUPA_HEADERS={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'resolution=merge-duplicates'};
+
+async function loadData(){
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/budget_data?id=eq.main&select=data`,{headers:SUPA_HEADERS});
+    const rows=await r.json();
+    if(rows&&rows.length>0&&rows[0].data) return rows[0].data;
+  }catch(e){console.log('Load failed',e);}
+  return JSON.parse(JSON.stringify(DEFAULT));
+}
+
+async function persist(){
+  try{
+    const res=await fetch(`${SUPA_URL}/rest/v1/budget_data?on_conflict=id`,{method:'POST',headers:SUPA_HEADERS,body:JSON.stringify({id:'main',data,updated_at:new Date().toISOString()})});
+    if(!res.ok){console.log('Save failed with status',res.status,await res.text());}
+  }catch(e){console.log('Save failed',e);}
+}
+
+let data={income:[],shop:[],spend:[]};
+
+const getTotalIncome=()=>data.income?data.income.reduce((s,i)=>s+i.amt,0):0;
+const getShopRemaining=()=>data.shop.filter(i=>!i.bought).reduce((s,i)=>s+i.price,0);
+const getShopBought=()=>data.shop.filter(i=>i.bought).reduce((s,i)=>s+i.price,0);
+const getSpendTotal=()=>data.spend.reduce((s,c)=>s+c.amt,0);
+const getCushion=()=>getTotalIncome()-DEBT-getShopRemaining()-getSpendTotal()-BUFFER;
+
+function renderIncomeGrid(){
+  if(!data.income)data.income=[];
+  document.getElementById('incomeGrid').innerHTML=data.income.length===0
+    ?'<div style="padding:1rem;font-size:12px;color:var(--text4);text-align:center;background:var(--bg2);border:1px dashed var(--border2);border-radius:2px;margin-bottom:1rem">No income sources yet. Add one below.</div>'
+    :data.income.map(s=>`
+      <div class="spend-cell">
+        <div class="spend-name-row"><span class="spend-name">${s.name}</span><button class="spend-del" onclick="deleteIncomeSource('${s.id}')">&#215;</button></div>
+        <input class="spend-amt-input" type="number" value="${s.amt}" min="0" oninput="updateIncomeAmt('${s.id}',this.value)">
+      </div>`).join('');
+}
+
+async function addIncomeSource(){
+  const name=document.getElementById('incomeName').value.trim();
+  const amt=parseFloat(document.getElementById('incomeAmt').value)||0;
+  if(!name)return;
+  if(!data.income)data.income=[];
+  data.income.push({id:uid(),name,amt});
+  document.getElementById('incomeName').value='';document.getElementById('incomeAmt').value='';
+  render();
+  await persist();
+}
+async function updateIncomeAmt(id,val){const s=data.income.find(x=>x.id===id);if(s){s.amt=parseFloat(val)||0;renderStats();renderBars();await persist();}}
+async function deleteIncomeSource(id){data.income=data.income.filter(s=>s.id!==id);render();await persist();}
+
+function renderStats(){
+  const cush=getCushion();
+  document.getElementById('statRow').innerHTML=`
+    <div class="stat"><div class="sl">Total income</div><div class="sv pos">${fmt(getTotalIncome())}</div><div class="ss">all sources</div></div>
+    <div class="stat"><div class="sl">Still to buy</div><div class="sv navy">${fmt(getShopRemaining())}</div><div class="ss">${data.shop.filter(i=>!i.bought).length} items left</div></div>
+    <div class="stat"><div class="sl">Bought</div><div class="sv">${fmt(getShopBought())}</div><div class="ss">${data.shop.filter(i=>i.bought).length} items done</div></div>
+    <div class="stat"><div class="sl">College spending</div><div class="sv navy">${fmt(getSpendTotal())}</div><div class="ss">planned</div></div>
+    <div class="stat"><div class="sl">Rutgers cushion</div><div class="sv ${cush>=2500?'pos':cush>=1000?'navy':'neg'}">${fmt(cush)}</div><div class="ss">after all spending</div></div>
+  `;
+  const pct=Math.min(100,Math.max(0,(cush/3000)*100));
+  document.getElementById('meterFill').style.cssText=`width:${pct}%;background:${cush>=2500?'#166534':cush>=1000?'#1e3a5f':'#dc2626'}`;
+  const ca=document.getElementById('cushionAmt');
+  ca.textContent=fmt(cush);
+  ca.className=cush>=2500?'pos':cush>=1000?'navy':'neg';
+  document.getElementById('safetyNote').textContent=
+    cush>=2500?'Safe - you can handle a bad month without panic.':
+    cush>=1500?'Okay but tight - one bad month puts you in trouble.':
+    cush>=500?'Danger - not enough cushion for 9 months.':
+    'Add income sources above to see your cushion.';
+}
+
+function renderBars(){
+  const total=getTotalIncome();
+  const months=[
+    {l:'Now',v:-DEBT},
+    {l:'June',v:-DEBT+(total*0.2)},
+    {l:'July',v:-DEBT+(total*0.55)},
+    {l:'Aug',v:-DEBT+total},
+  ];
+  const maxAbs=Math.max(...months.map(m=>Math.abs(m.v)),1);
+  document.getElementById('bars').innerHTML=months.map(m=>{
+    const pct=Math.min(100,(Math.abs(m.v)/maxAbs)*95);
+    return`<div class="bar-row"><div class="bar-lbl">${m.l}</div><div class="bar-bg"><div class="bar-fill ${m.v>=0?'bar-pos':'bar-neg'}" style="width:${Math.max(pct,2)}%">${fmt(m.v)}</div></div></div>`;
+  }).join('');
+}
+
+function renderShopList(){
+  const remaining=data.shop.filter(i=>!i.bought);
+  const bought=data.shop.filter(i=>i.bought);
+  const total=data.shop.length;
+  document.getElementById('shopProgress').innerHTML=total===0?'':
+    `<div class="shop-progress">${bought.length} of ${total} items bought &middot; <span>${fmt(getShopBought())}</span> spent &middot; <span>${fmt(getShopRemaining())}</span> still needed</div>`;
+  const all=[...remaining,...bought];
+  document.getElementById('shopList').innerHTML=all.length===0
+    ?'<div class="empty-state">No items yet. Add something above.</div>'
+    :all.map(i=>`<div class="shop-item${i.bought?' bought':''}">
+      <div class="shop-check" onclick="toggleBought('${i.id}')">&#10003;</div>
+      <div class="shop-name">${i.name}</div>
+      <div class="shop-cat">${i.cat}</div>
+      <div class="shop-price">${fmt(i.price)}</div>
+      <button class="shop-del" onclick="deleteShopItem('${i.id}')">&#215;</button>
+    </div>`).join('');
+}
+
+function renderSpendGrid(){
+  document.getElementById('spendGrid').innerHTML=data.spend.length===0
+    ?'<div style="padding:1rem;font-size:12px;color:var(--text4);text-align:center;background:var(--bg2);border:1px dashed var(--border2);border-radius:2px;margin-bottom:1rem">No categories yet.</div>'
+    :data.spend.map(c=>`
+      <div class="spend-cell">
+        <div class="spend-name-row"><span class="spend-name">${c.name}</span><button class="spend-del" onclick="deleteSpendCat('${c.id}')">&#215;</button></div>
+        <input class="spend-amt-input" type="number" value="${c.amt}" min="0" oninput="updateSpendAmt('${c.id}',this.value)">
+        <div class="spend-weekly">${fmt(c.amt/36)}/wk over 36 weeks</div>
+      </div>`).join('');
+}
+
+function addShopItem(){
+  const name=document.getElementById('shopName').value.trim();
+  const price=parseFloat(document.getElementById('shopPrice').value)||0;
+  const cat=document.getElementById('shopCat').value;
+  if(!name)return;
+  data.shop.push({id:uid(),name,price,cat,bought:false});
+  persist();document.getElementById('shopName').value='';document.getElementById('shopPrice').value='';render();
+}
+function toggleBought(id){const i=data.shop.find(x=>x.id===id);if(i)i.bought=!i.bought;persist();render();}
+function deleteShopItem(id){data.shop=data.shop.filter(i=>i.id!==id);persist();render();}
+
+function addSpendCat(){
+  const name=document.getElementById('spendName').value.trim();
+  const amt=parseFloat(document.getElementById('spendAmt').value)||0;
+  if(!name)return;
+  data.spend.push({id:uid(),name,amt});
+  persist();document.getElementById('spendName').value='';document.getElementById('spendAmt').value='';render();
+}
+function updateSpendAmt(id,val){const c=data.spend.find(x=>x.id===id);if(c){c.amt=parseFloat(val)||0;persist();renderStats();renderBars();}}
+function deleteSpendCat(id){data.spend=data.spend.filter(c=>c.id!==id);persist();render();}
+
+function render(){renderStats();renderBars();renderShopList();renderSpendGrid();renderIncomeGrid();}
+
+document.getElementById('shopName').addEventListener('keydown',e=>{if(e.key==='Enter')addShopItem();});
+document.getElementById('spendName').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('spendAmt').focus();});
+document.getElementById('spendAmt').addEventListener('keydown',e=>{if(e.key==='Enter')addSpendCat();});
+document.getElementById('incomeName').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('incomeAmt').focus();});
+document.getElementById('incomeAmt').addEventListener('keydown',e=>{if(e.key==='Enter')addIncomeSource();});
+async function init(){data=await loadData();render();}
+init();
+
+</script>
+</body>
+</html>
